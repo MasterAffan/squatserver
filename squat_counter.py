@@ -15,6 +15,7 @@ def calculate_angle(a, b, c):
     return angle if angle <= 180.0 else 360 - angle
 
 def process_squat_video(input_path, output_path):
+    print(f"[INFO] Starting squat video processing for: {input_path}")
     raw_path = output_path.replace('.mp4', '_raw.mp4')
 
     cap = cv2.VideoCapture(input_path)
@@ -43,6 +44,7 @@ def process_squat_video(input_path, output_path):
     sample_rate = 3  # Process every 3rd frame
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        print("[INFO] MediaPipe Pose model loaded.")
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -87,6 +89,7 @@ def process_squat_video(input_path, output_path):
                         squat_stage = "up"
                         # Rep finished
                         squat_counter += 1
+                        print(f"[INFO] Rep {squat_counter} finished. Min knee angle: {rep_min_knee_angle:.2f}")
                         min_knee_angles.append(rep_min_knee_angle)
                         rep_issues = []
                         feedback_reasons = []
@@ -166,6 +169,7 @@ def process_squat_video(input_path, output_path):
     subprocess.run(ffmpeg_cmd, check=True)
     os.remove(raw_path)
     print("✅ H.264 conversion complete")
+    print(f"[INFO] Processing complete. Total squats counted: {squat_counter}")
 
     # Aggregate stats
     squat_count = squat_counter
